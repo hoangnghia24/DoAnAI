@@ -221,7 +221,7 @@ class Game:
         self.box_pushes = 0
         self.history = []
         self.dropdown_options = ['BFS solver', 'DLS solver','IDS solver','UCS solver','Greedy solver','A* solver','Simulated Annealing solver', 'Beam solver', 'Genetic solver'
-                                 ,'And Or solver', 'Unobservable','Partially Observable solver','Backtracking solver','Forward Checking solver','Arc Consistency solver']
+                                 ,'And Or solver', 'Unobservable solver','Partially Observable solver','Backtracking solver','Forward Checking solver','Arc Consistency solver']
         self.dropdown_selected = 0
         self.dropdown_open = False
         self.dropdown_rect = pygame.Rect(SCREEN_WIDTH-100, 200, 250, 25)
