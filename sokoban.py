@@ -517,19 +517,15 @@ class Game:
         return buttons
 
     async def flash_message(self, text_str, duration=0.5, font_size=36):
-        """Show a centered transient message for `duration` seconds then redraw.
 
-        This replaces ad-hoc blit/flip/sleep blocks so messages don't stack
-        on-screen during rapid batch runs.
-        """
         font = pygame.font.Font(None, font_size)
         text = font.render(text_str, True, WHITE)
         text_rect = text.get_rect(center=(SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
-        # draw over current frame
+
         self.screen.blit(text, text_rect)
         pygame.display.flip()
         await asyncio.sleep(duration)
-        # redraw the game contents to remove the message
+
         self.draw()
 
     async def run_algorithm(self,name):
@@ -598,7 +594,6 @@ class Game:
             await self.flash_message(f'No {name} solution found', duration=1.5, font_size=36)
             return
 
-        # Animate the path
         self.reset_level()
         self.draw()
         await asyncio.sleep(0.2)
