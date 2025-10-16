@@ -14,6 +14,8 @@ Huỳnh Anh Nguyên 23110134
 
 đồ án AI game SOKOBAN
 
+link github https://github.com/hoangnghia24/DoAnAI
+
 SOKOBAN
 
 SOKOBAN được ứng dụng 5 nhóm thuật toán vào để có thể tìm ra lời giải:
