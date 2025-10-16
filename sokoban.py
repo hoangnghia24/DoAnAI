@@ -220,17 +220,13 @@ class Game:
         self.steps = 0
         self.box_pushes = 0
         self.history = []
-        # Persistent dropdown state for algorithm selection (additive)
-        # labels match the ones you already render in draw()
         self.dropdown_options = ['BFS solver', 'DLS solver','IDS solver','UCS solver','Greedy solver','A* solver','Simulated Annealing solver', 'Beam solver', 'Genetic solver'
                                  ,'And Or solver', 'Unobservable','Partially Observable solver','Backtracking solver','Forward Checking solver','Arc Consistency solver']
         self.dropdown_selected = 0
         self.dropdown_open = False
         self.dropdown_rect = pygame.Rect(SCREEN_WIDTH-100, 200, 250, 25)
         self.dropdown_item_height = 25
-        # Flag to indicate a 'run all algorithms' operation is active
         self.running_all = False
-        # Load images (assumes JPG folder exists)
         try:
             self.images = {
                 'wall': pygame.image.load(os.path.join('JPG', 'Blocks', 'block_06.jpg')).convert_alpha(),
@@ -246,7 +242,6 @@ class Game:
                 if key != 'goal':
                     self.images[key] = pygame.transform.scale(self.images[key], (TILE_SIZE, TILE_SIZE))
         except FileNotFoundError:
-            # Fallback to placeholder surfaces if images not found
             self.images = {
                 'wall': pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA),
                 'floor': pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA),
