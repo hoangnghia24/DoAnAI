@@ -1,9 +1,8 @@
 import time
-import heapq  # Sử dụng heapq cho hàng đợi ưu tiên của A*
+import heapq
 from collections import deque
 from typing import List, Tuple, Optional, Set, FrozenSet
 
-# --- Các hàm phụ trợ (Lưu lời giải, lấy tường, đích, v.v.) giữ nguyên ---
 def save_partially_observable_solution(level_idx: int, path: Optional[List[int]], elapsed_time: float):
     if path is None:
         return
@@ -24,7 +23,6 @@ def get_goals(g: List[List[str]]) -> Set[Tuple[int, int]]:
 def get_walls(g: List[List[str]]) -> Set[Tuple[int, int]]:
     return {(x, y) for y, row in enumerate(g) for x, c in enumerate(row) if c == '#'}
 
-# Tái sử dụng hàm tính deadlock hiệu quả
 def _precompute_deadlocks(walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int]], level_data: List[List[str]]) -> Set[Tuple[int, int]]:
     deadlocks = set()
     height = len(level_data)
@@ -34,7 +32,6 @@ def _precompute_deadlocks(walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int
             pos = (c, r)
             if pos in walls or pos in goals:
                 continue
-            # Góc
             if ((c - 1, r) in walls and (c, r - 1) in walls) or \
                ((c + 1, r) in walls and (c, r - 1) in walls) or \
                ((c - 1, r) in walls and (c, r + 1) in walls) or \
@@ -42,17 +39,9 @@ def _precompute_deadlocks(walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int
                 deadlocks.add(pos)
     return deadlocks
 
-
-# --- TỐI ƯU HÓA BẮT ĐẦU TỪ ĐÂY ---
-
-def heuristic_for_belief_state(belief: FrozenSet[Tuple[Tuple[int, int], FrozenSet[Tuple[int, int]]]], 
-                               goals: Set[Tuple[int, int]], 
+def heuristic_for_belief_state(belief: FrozenSet[Tuple[Tuple[int, int], FrozenSet[Tuple[int, int]]]],
+                               goals: Set[Tuple[int, int]],
                                deadlocks: Set[Tuple[int, int]]) -> int:
-    """
-    Hàm Heuristic cho thuật toán A*.
-    Ước tính chi phí từ tập hợp niềm tin hiện tại đến mục tiêu.
-    Chúng ta chọn cách tiếp cận lạc quan: lấy heuristic nhỏ nhất trong số tất cả các trạng thái có thể.
-    """
     min_heuristic = float('inf')
     
     goal_list = list(goals)
@@ -62,16 +51,14 @@ def heuristic_for_belief_state(belief: FrozenSet[Tuple[Tuple[int, int], FrozenSe
     for _, boxes_pos in belief:
         current_h = 0
         
-        # 1. Tổng khoảng cách Manhattan
         for box in boxes_pos:
             if box not in goals:
                 current_h += min(abs(box[0] - g[0]) + abs(box[1] - g[1]) for g in goal_list)
 
-        # 2. Phạt nặng cho deadlock
         for box in boxes_pos:
             if box not in goals and box in deadlocks:
-                current_h += 1000  # Phạt nặng
-                break # Một hộp bị kẹt là đủ tệ
+                current_h += 1000
+                break
 
         if current_h < min_heuristic:
             min_heuristic = current_h
@@ -83,9 +70,6 @@ def solve_with_partially_observable_search_astar(level_data: List[List[str]], le
                                                  possible_start_states: Optional[List[Tuple[Tuple[int, int], FrozenSet[Tuple[int, int]]]]] = None,
                                                  max_steps: int = 20000,
                                                  max_time_s: float = 30.0) -> Optional[List[int]]:
-    """
-    Giải quyết Sokoban quan sát được một phần bằng tìm kiếm A* trên không gian tập hợp niềm tin.
-    """
     
     def make_default_states():
         player = None
@@ -112,7 +96,7 @@ def solve_with_partially_observable_search_astar(level_data: List[List[str]], le
     goals = get_goals(level_data)
     walls = get_walls(level_data)
     deadlocks = _precompute_deadlocks(walls, goals, level_data)
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)] # L, R, U, D
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
     if true_initial_state is None or possible_start_states is None:
         default_state, default_list = make_default_states()
@@ -124,12 +108,9 @@ def solve_with_partially_observable_search_astar(level_data: List[List[str]], le
 
     start_belief = frozenset(possible_start_states)
     
-    # Hàng đợi ưu tiên cho A*: (f_cost, g_cost, path, belief)
-    # g_cost (len(path)) được thêm vào để phá vỡ thế hòa bằng cách ưu tiên các đường đi ngắn hơn
     h_cost = heuristic_for_belief_state(start_belief, goals, deadlocks)
     priority_queue = [(h_cost, 0, [], start_belief)] 
     
-    # visited bây giờ lưu chi phí tốt nhất để đến một belief state
     visited = {start_belief: 0}
 
     print(f"Partially Observable A*: Bắt đầu giải Level {level_idx}...")
@@ -153,7 +134,6 @@ def solve_with_partially_observable_search_astar(level_data: List[List[str]], le
             return path
 
         for action, (dx, dy) in enumerate(directions):
-            # Tạo tập hợp niềm tin kế thừa
             successor_builder = set()
             for player_pos, boxes_pos in belief:
                 next_player = (player_pos[0] + dx, player_pos[1] + dy)
@@ -165,7 +145,7 @@ def solve_with_partially_observable_search_astar(level_data: List[List[str]], le
                 if next_player in boxes_pos:
                     next_box = (next_player[0] + dx, next_player[1] + dy)
                     if next_box in walls or next_box in boxes_pos:
-                        successor_builder.add((player_pos, boxes_pos)) # Đẩy không thành công
+                        successor_builder.add((player_pos, boxes_pos))
                     else:
                         new_boxes = set(boxes_pos)
                         new_boxes.remove(next_player)
@@ -174,13 +154,11 @@ def solve_with_partially_observable_search_astar(level_data: List[List[str]], le
                 else:
                     successor_builder.add((next_player, boxes_pos))
             
-            # Phân nhóm các trạng thái kế thừa theo quan sát
             obs_groups = {}
             for st in successor_builder:
                 obs = observation(st[0], walls, st[1])
                 obs_groups.setdefault(obs, set()).add(st)
 
-            # Đưa các tập hợp niềm tin mới vào hàng đợi
             for _, group in obs_groups.items():
                 new_belief = frozenset(group)
                 new_g_cost = g_cost + 1
@@ -194,3 +172,4 @@ def solve_with_partially_observable_search_astar(level_data: List[List[str]], le
 
     print(f"Partially Observable A*: Không tìm thấy lời giải trong giới hạn ({max_steps} bước).")
     return None
+

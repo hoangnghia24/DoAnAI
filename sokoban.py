@@ -617,77 +617,77 @@ class Game:
 
     async def run_all_algorithms(self):
         name = ""
-        self.reset_level()
-        name = "BFS"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
+        # self.reset_level()
+        # name = "BFS"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "DLS"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "IDS"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "UCS"
+        # await self.run_algorithm(name)
+
+        # self.reset_level()
+        # name = "Greedy"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "A*"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "SA"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "Beam"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "Genetic"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "And-Or"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "Unobservable"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "Partially Observable"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "Backtracking"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
+
+        # self.reset_level()
+        # name = "Forward Checking"
+        # await self.run_algorithm(name)
+        # await asyncio.sleep(1)
 
         self.reset_level()
-        name = "DLS"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "IDS"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "UCS"
-        await self.run_algorithm(name)
-
-        self.reset_level()
-        name = "Greedy"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "A*"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "SA"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "Beam"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "Genetic"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "And-Or"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "Unobservable"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "Partially Observable"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "Backtracking"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "Forward Checking"
-        await self.run_algorithm(name)
-        await asyncio.sleep(1)
-
-        self.reset_level()
-        name = "ARC Consistency"
+        name = "Arc Consistency"
         await self.run_algorithm(name)
         await asyncio.sleep(1)
 

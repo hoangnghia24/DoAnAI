@@ -4,9 +4,7 @@ import random
 from typing import List, Tuple, Optional, Set, FrozenSet, Iterable
 from collections import deque
 
-# --- Các hàm phụ trợ không thay đổi ---
 def save_sa_solution(level_idx, path, elapsed_time):
-    # ... (giữ nguyên mã của bạn)
     if path is None:
         return
     try:
@@ -22,7 +20,6 @@ def save_sa_solution(level_idx, path, elapsed_time):
 
 
 def _find_player(level_data: List[List[str]]) -> Optional[Tuple[int, int]]:
-    # ... (giữ nguyên mã của bạn)
     for y, row in enumerate(level_data):
         for x, c in enumerate(row):
             if c in ['@', '+']:
@@ -30,26 +27,15 @@ def _find_player(level_data: List[List[str]]) -> Optional[Tuple[int, int]]:
     return None
 
 def _get_goals(level_data: List[List[str]]) -> Set[Tuple[int, int]]:
-    # ... (giữ nguyên mã của bạn)
     return {(x, y) for y, row in enumerate(level_data) for x, c in enumerate(row) if c in ['.', '+', '*']}
 
 def _get_boxes(level_data: List[List[str]]) -> FrozenSet[Tuple[int, int]]:
-    # ... (giữ nguyên mã của bạn)
     return frozenset((x, y) for y, row in enumerate(level_data) for x, c in enumerate(row) if c in ['$', '*'])
 
 def _get_walls(level_data: List[List[str]]) -> Set[Tuple[int, int]]:
-    # ... (giữ nguyên mã của bạn)
     return {(x, y) for y, row in enumerate(level_data) for x, c in enumerate(row) if c == '#'}
 
-
-# --- TỐI ƯU HÓA BẮT ĐẦU TỪ ĐÂY ---
-
 def _precompute_deadlocks(walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int]], level_data: List[List[str]]) -> Set[Tuple[int, int]]:
-    """
-    TÍNH TOÁN TRƯỚC các ô deadlock tĩnh. Một ô là deadlock nếu nó không phải là đích và:
-    1. Bị kẹt ở góc.
-    2. Bị kẹt dọc theo một bức tường mà không có lối thoát hoặc đích nào trên đường đi.
-    """
     deadlocks = set()
     height = len(level_data)
     width = len(level_data[0]) if height > 0 else 0
@@ -60,7 +46,6 @@ def _precompute_deadlocks(walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int
             if pos in walls or pos in goals:
                 continue
 
-            # 1. Kiểm tra kẹt ở góc (giữa 2 bức tường)
             is_corner = ((c - 1, r) in walls and (c, r - 1) in walls) or \
                         ((c + 1, r) in walls and (c, r - 1) in walls) or \
                         ((c - 1, r) in walls and (c, r + 1) in walls) or \
@@ -69,37 +54,30 @@ def _precompute_deadlocks(walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int
                 deadlocks.add(pos)
                 continue
 
-            # 2. Kiểm tra kẹt dọc tường (khó hơn)
-            # Kẹt tường ngang (trên hoặc dưới)
             for dy in [-1, 1]:
                 if (c, r + dy) in walls:
                     is_stuck = True
-                    # Quét sang trái để tìm lối ra hoặc đích
                     for x_scan in range(c, -1, -1):
                         if (x_scan, r + dy) not in walls: is_stuck = False; break
                         if (x_scan, r) in goals: is_stuck = False; break
                     if not is_stuck: continue
                     
                     is_stuck = True
-                    # Quét sang phải để tìm lối ra hoặc đích
                     for x_scan in range(c, width):
                         if (x_scan, r + dy) not in walls: is_stuck = False; break
                         if (x_scan, r) in goals: is_stuck = False; break
                     if is_stuck:
                         deadlocks.add(pos)
 
-            # Kẹt tường dọc (trái hoặc phải)
             for dx in [-1, 1]:
                 if (c + dx, r) in walls:
                     is_stuck = True
-                    # Quét lên trên
                     for y_scan in range(r, -1, -1):
                         if (c + dx, y_scan) not in walls: is_stuck = False; break
                         if (c, y_scan) in goals: is_stuck = False; break
                     if not is_stuck: continue
 
                     is_stuck = True
-                    # Quét xuống dưới
                     for y_scan in range(r, height):
                         if (c + dx, y_scan) not in walls: is_stuck = False; break
                         if (c, y_scan) in goals: is_stuck = False; break
@@ -109,18 +87,11 @@ def _precompute_deadlocks(walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int
     return deadlocks
 
 def energy_function(boxes: FrozenSet[Tuple[int, int]], goals: Set[Tuple[int, int]], deadlocks: Set[Tuple[int, int]]) -> int:
-    """
-    Hàm năng lượng được cải tiến:
-    - Tổng khoảng cách Manhattan từ mỗi hộp đến đích gần nhất.
-    - Phạt NẶNG nếu có bất kỳ hộp nào (chưa ở trên đích) nằm trong khu vực deadlock.
-    """
     if not goals:
         return 0
     
-    # Phạt nặng cho mỗi hộp trong khu vực deadlock
     for b in boxes:
         if b not in goals and b in deadlocks:
-            # Trả về giá trị rất lớn để thuật toán gần như không bao giờ chọn trạng thái này
             return 100000 
 
     total_manhattan_distance = 0
@@ -142,10 +113,8 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
                                    max_time: float = 10.0,
                                    restarts: int = 3) -> Optional[List[int]]:
     
-    # --- Khởi tạo ---
     walls = _get_walls(level_data)
     goals = _get_goals(level_data)
-    # **TỐI ƯU**: Tính toán deadlock một lần duy nhất khi bắt đầu
     deadlocks = _precompute_deadlocks(walls, goals, level_data)
 
     if possible_start_states is None:
@@ -166,8 +135,6 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
     action_map = {(-1, 0): 0, (1, 0): 1, (0, -1): 2, (0, 1): 3}
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-    # --- Các hàm nội bộ (BFS và chuyển đổi tọa độ) không thay đổi ---
-    # ... (giữ nguyên player_bfs và coords_to_actions)
     def player_bfs(start, goal, boxes_set: FrozenSet[Tuple[int, int]]):
         if start == goal:
             return [start]
@@ -193,7 +160,6 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
             out.append(action_map[(dx, dy)])
         return out
     
-    # **TỐI ƯU**: Truyền `deadlocks` vào hàm năng lượng
     calculate_energy = lambda boxes_pos: energy_function(boxes_pos, goals, deadlocks)
 
     if initial_temp is None:
@@ -213,7 +179,6 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
 
         for it in range(max_iterations):
             if time.time() - global_start > max_time:
-                # ... (phần xử lý timeout giữ nguyên)
                 if best_energy == 0:
                     elapsed = time.time() - global_start
                     save_sa_solution(level_idx, best_actions, elapsed)
@@ -229,7 +194,6 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
             player_pos, boxes_pos = current_state
             candidates = []
 
-            # Tạo các nước đi lân cận (chỉ đẩy hộp)
             for b in boxes_pos:
                 for dx, dy in directions:
                     push_from = (b[0] - dx, b[1] - dy)
@@ -253,12 +217,10 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
             if not candidates:
                 break 
 
-            # Chọn nước đi tiếp theo (giữ nguyên logic top-k)
             candidates.sort(key=lambda t: t[2])
             topk = candidates[:min(10, len(candidates))]
             actions_seq, next_state, next_energy = random.choice(topk)
 
-            # Logic chấp nhận của Simulated Annealing
             delta = next_energy - current_energy
             if delta < 0 or (temp > 1e-9 and random.random() < math.exp(-delta / temp)):
                 current_state = next_state
@@ -272,8 +234,6 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
 
             temp *= cooling_rate
         
-        # ... (phần restart và làm nhiễu giữ nguyên)
-
     if best_energy == 0:
         elapsed = time.time() - global_start
         save_sa_solution(level_idx, best_actions, elapsed)
@@ -281,3 +241,4 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
 
     print(f"SA: Không tìm thấy lời giải cho Level {level_idx}. Năng lượng tốt nhất={best_energy}")
     return None
+

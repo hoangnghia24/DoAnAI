@@ -25,7 +25,6 @@ def is_deadlock(boxes_pos: FrozenSet[Tuple[int, int]], walls: Set[Tuple[int, int
 
         x, y = box
 
-        # 1. Kiểm tra bế tắc ở góc (giống Forward Checking)
         is_stuck_in_corner = (
             ((x - 1, y) in walls and (x, y - 1) in walls) or
             ((x + 1, y) in walls and (x, y - 1) in walls) or
@@ -34,35 +33,30 @@ def is_deadlock(boxes_pos: FrozenSet[Tuple[int, int]], walls: Set[Tuple[int, int
         )
         if is_stuck_in_corner:
             return True
-
-        # 2. Kiểm tra bế tắc "đóng băng" trên tường (tinh thần của Arc Consistency)
-        # Kiểm tra tường ngang
         if (x, y - 1) in walls or (x, y + 1) in walls:
             is_frozen = True
-            # Quét sang trái xem có đích không
             for i in range(x, -1, -1):
                 if (i, y) in walls: break
                 if (i, y) in goals: is_frozen = False; break
             if not is_frozen: continue
 
             is_frozen = True
-             # Quét sang phải xem có đích không
+
             for i in range(x, len(walls)):
                 if (i, y) in walls: break
                 if (i, y) in goals: is_frozen = False; break
             if is_frozen: return True
 
-        # Kiểm tra tường dọc
         if (x - 1, y) in walls or (x + 1, y) in walls:
             is_frozen = True
-            # Quét lên trên
+
             for i in range(y, -1, -1):
                 if (x, i) in walls: break
                 if (x, i) in goals: is_frozen = False; break
             if not is_frozen: continue
 
             is_frozen = True
-            # Quét xuống dưới
+
             for i in range(y, len(walls)):
                 if (x, i) in walls: break
                 if (x, i) in goals: is_frozen = False; break

@@ -2,11 +2,9 @@ import time
 import sys
 from typing import List, Tuple, Optional, Set, FrozenSet
 
-# Tăng giới hạn đệ quy để xử lý các màn chơi phức tạp
 sys.setrecursionlimit(10000)
 
 def save_ids_solution(level_idx, path, elapsed_time):
-    """Lưu lời giải tìm được vào file ids_solutions.txt."""
     if path is None:
         return
     with open("solutions.txt", "a", encoding="utf-8") as f:
@@ -18,10 +16,6 @@ def save_ids_solution(level_idx, path, elapsed_time):
     print(f"IDS: Đã lưu lời giải cho Level {level_idx} vào solutions.txt")
 
 def solve_with_ids(level_data: List[List[str]], level_idx: int, max_depth=150):
-    """
-    Giải một màn chơi Sokoban bằng thuật toán Iterative Deepening Search (IDS).
-    """
-    # --- Các hàm helper nội bộ và khởi tạo ---
     def find_player(g: List[List[str]]) -> Optional[Tuple[int, int]]:
         for y, row in enumerate(g):
             for x, char in enumerate(row):
@@ -49,15 +43,12 @@ def solve_with_ids(level_data: List[List[str]], level_idx: int, max_depth=150):
     print(f"IDS: Bắt đầu giải Level {level_idx} (max_depth={max_depth})...")
     start_time = time.time()
 
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)] # 0: Trái, 1: Phải, 2: Lên, 3: Xuống
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-    # --- Hàm đệ quy cho DLS ---
     def _dls_recursive(path, current_player_pos, current_boxes_pos, depth_limit):
-        # Điều kiện dừng: Vượt quá giới hạn độ sâu
         if len(path) >= depth_limit:
             return None
 
-        # Thử tất cả các hành động có thể
         for action, (dx, dy) in enumerate(directions):
             next_player_pos = (current_player_pos[0] + dx, current_player_pos[1] + dy)
 
@@ -78,29 +69,22 @@ def solve_with_ids(level_data: List[List[str]], level_idx: int, max_depth=150):
             new_path = path + [action]
             new_state = (next_player_pos, new_boxes_pos)
 
-            # Tránh lặp lại trạng thái trong cùng một đường đi
             if new_state in visited_this_iteration:
                 continue
 
             visited_this_iteration.add(new_state)
 
-            # Kiểm tra điều kiện thắng
             if goals.issubset(new_boxes_pos):
                 return new_path
 
-            # Gọi đệ quy
             result = _dls_recursive(new_path, next_player_pos, new_boxes_pos, depth_limit)
             if result is not None:
                 return result
 
         return None
 
-    # --- Vòng lặp chính của IDS ---
     for depth_limit in range(max_depth):
-
-        # visited phải được reset ở mỗi vòng lặp của IDS
         visited_this_iteration = {(initial_player_pos, initial_boxes)}
-
         solution_path = _dls_recursive([], initial_player_pos, initial_boxes, depth_limit)
 
         if solution_path is not None:
@@ -112,3 +96,4 @@ def solve_with_ids(level_data: List[List[str]], level_idx: int, max_depth=150):
 
     print(f"IDS: Không tìm thấy lời giải cho Level {level_idx} trong giới hạn độ sâu.")
     return None
+

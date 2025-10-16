@@ -2,11 +2,9 @@ import time
 import sys
 from typing import List, Tuple, Optional, Set, FrozenSet
 
-# Tăng giới hạn đệ quy để xử lý các màn chơi phức tạp
 sys.setrecursionlimit(10000)
 
 def save_fc_solution(level_idx, path,elapsed_time):
-    """Lưu lời giải tìm được vào file fc_solutions.txt."""
     if path is None:
         return
     with open("solutions.txt", "a", encoding="utf-8") as f:
@@ -18,27 +16,20 @@ def save_fc_solution(level_idx, path,elapsed_time):
     print(f"Forward Checking: Đã lưu lời giải cho Level {level_idx} vào solutions.txt")
 
 def is_deadlock(boxes_pos: FrozenSet[Tuple[int, int]], walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int]]) -> bool:
-
     for box in boxes_pos:
-        # Nếu một thùng không nằm trên đích
         if box not in goals:
             x, y = box
-            # Kiểm tra 4 góc
             is_stuck_in_corner = (
-                (x - 1, y) in walls and (x, y - 1) in walls or # Góc trên-trái
-                (x + 1, y) in walls and (x, y - 1) in walls or # Góc trên-phải
-                (x - 1, y) in walls and (x, y + 1) in walls or # Góc dưới-trái
-                (x + 1, y) in walls and (x, y + 1) in walls    # Góc dưới-phải
+                (x - 1, y) in walls and (x, y - 1) in walls or
+                (x + 1, y) in walls and (x, y - 1) in walls or
+                (x - 1, y) in walls and (x, y + 1) in walls or
+                (x + 1, y) in walls and (x, y + 1) in walls
             )
             if is_stuck_in_corner:
-                return True #bế tắc!
+                return True
     return False
 
 def solve_with_forward_checking(level_data: List[List[str]], level_idx: int, max_depth=250):
-    """
-    Giải một màn chơi bằng Backtracking kết hợp Forward Checking (Deadlock Detection).
-    """
-    # Các hàm helper nội bộ và khởi tạo
     def find_player(g: List[List[str]]) -> Optional[Tuple[int, int]]:
         for y, row in enumerate(g):
             for x, char in enumerate(row):
@@ -65,7 +56,6 @@ def solve_with_forward_checking(level_data: List[List[str]], level_idx: int, max
     start_time = time.time()
     directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-    #Hàm đệ quy
     def _backtrack_with_fc(current_player_pos, current_boxes_pos, current_depth):
         if goals.issubset(current_boxes_pos):
             return True
@@ -97,19 +87,15 @@ def solve_with_forward_checking(level_data: List[List[str]], level_idx: int, max
                 box_list.append(next_box_pos)
                 new_boxes_pos = frozenset(sorted(box_list))
 
-            # FORWARD CHECKING
-            # Nếu là một hành động đẩy thùng, hãy kiểm tra xem nó có tạo ra bế tắc không.
             if is_push and is_deadlock(new_boxes_pos, walls, goals):
-                continue # Cắt tỉa nhánh này!
+                continue
 
-            # Nếu vượt qua kiểm tra, gọi đệ quy
             if _backtrack_with_fc(next_player_pos, new_boxes_pos, current_depth + 1):
                 solution_path.insert(0, action)
                 return True
 
         return False
 
-    # --- Gọi hàm và xử lý kết quả ---
     if _backtrack_with_fc(initial_player_pos, initial_boxes, 0):
         elapsed_time = time.time() - start_time
         print(f"Forward Checking: Tìm thấy lời giải sau {elapsed_time:.2f} giây.")
@@ -119,3 +105,4 @@ def solve_with_forward_checking(level_data: List[List[str]], level_idx: int, max
     else:
         print(f"Forward Checking: Không tìm thấy lời giải cho Level {level_idx}.")
         return None
+
