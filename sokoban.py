@@ -22,20 +22,20 @@ import forward_checking_sokoban
 import arc_consistency_sokoban
 import and_or_search_sokoban
 import partially_observable_sokoban
-#from game_core import Game
+
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
-# Initialize Pygame
+
 pygame.init()
 
-# Constants
+
 TILE_SIZE = 60
 SCREEN_WIDTH = 10 * TILE_SIZE
 SCREEN_HEIGHT = 10 * TILE_SIZE
 MENU_WIDTH = 650
 MENU_HEIGHT = 500
 FPS = 165
-# Colors
+
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 BLUE = (50, 50, 255)
