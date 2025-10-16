@@ -120,7 +120,6 @@ def solve_with_genetic_algorithm(level_data: List[List[str]], level_idx: int,
         population_with_fitness.sort(key=lambda item: item[1], reverse=True)
 
         best_fitness = population_with_fitness[0][1]
-        print(f"  -> Thế hệ {generation}: Fitness tốt nhất = {best_fitness:.2f}")
 
         if best_fitness >= 10000.0:
             best_solution = population_with_fitness[0][0]
