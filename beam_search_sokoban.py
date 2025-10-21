@@ -26,7 +26,7 @@ def heuristic_manhattan_distance(boxes: FrozenSet[Tuple[int, int]], goals: Set[T
 
     return total_distance
 
-def solve_with_beam_search(level_data: List[List[str]], level_idx: int, beam_width=100, max_iterations=500):
+def solve_with_beam_search(level_data: List[List[str]], level_idx: int, beam_width=3, max_iterations=500):
     grid = [list(row) for row in level_data]
 
     def find_player(g: List[List[str]]) -> Optional[Tuple[int, int]]:

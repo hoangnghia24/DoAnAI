@@ -15,7 +15,7 @@ def save_unobservable_solution(level_idx, path,elapsed_time):
 
 def solve_with_unobservable_search(level_data: List[List[str]], level_idx: int,
                                   possible_start_states: List[Tuple[Tuple[int, int], FrozenSet[Tuple[int, int]]]] = None):
-    
+
     def get_goals(g: List[List[str]]) -> Set[Tuple[int, int]]:
         return {(x, y) for y, row in enumerate(g) for x, char in enumerate(row) if char in ['.', '+', '*']}
 

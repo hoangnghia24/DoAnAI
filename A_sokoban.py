@@ -2,7 +2,7 @@ import time
 import heapq
 from typing import List, Tuple, Optional, Set, FrozenSet
 
-# g(n): Chi phí thực tế của một hành động
+
 COST_PLAYER_MOVE = 1
 COST_BOX_PUSH = 10
 
@@ -19,9 +19,6 @@ def save_a_star_solution(level_idx, path,elapsed_time):
     print(f"A*: Đã lưu lời giải cho Level {level_idx} vào solutions.txt")
 
 def heuristic_manhattan_distance(boxes: FrozenSet[Tuple[int, int]], goals: Set[Tuple[int, int]]) -> int:
-    """
-    h(n): Heuristic tính tổng khoảng cách Manhattan nhỏ nhất từ mỗi thùng đến một đích.
-    """
     total_distance = 0
     if not goals:
         return 0
@@ -32,10 +29,7 @@ def heuristic_manhattan_distance(boxes: FrozenSet[Tuple[int, int]], goals: Set[T
     return total_distance
 
 def solve_with_a_star(level_data: List[List[str]], level_idx: int, max_states=50000):
-    """
-    Giải một màn chơi bằng thuật toán A* (A-Star).
-    """
-    # --- Các hàm helper nội bộ và khởi tạo ---
+
     def find_player(g: List[List[str]]) -> Optional[Tuple[int, int]]:
         for y, row in enumerate(g):
             for x, char in enumerate(row):
@@ -60,26 +54,19 @@ def solve_with_a_star(level_data: List[List[str]], level_idx: int, max_states=50
     goals = get_goals(level_data)
     walls = get_walls(level_data)
     initial_state = (initial_player_pos, initial_boxes)
-
-    # --- Cấu trúc dữ liệu cho A* ---
-    # Hàng đợi ưu tiên: (f_cost, g_cost, path, state)
-    # g_cost được lưu riêng để tiện tính toán cho trạng thái tiếp theo
     initial_g_cost = 0
     initial_h_cost = heuristic_manhattan_distance(initial_boxes, goals)
     initial_f_cost = initial_g_cost + initial_h_cost
 
     pq = [(initial_f_cost, initial_g_cost, [], initial_state)]
     heapq.heapify(pq)
-
-    # Visited lưu chi phí g(n) thấp nhất để đến một trạng thái
     visited = {initial_state: 0}
 
     print(f"A*: Bắt đầu giải Level {level_idx}...")
     start_time = time.time()
 
-    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)] # 0: Trái, 1: Phải, 2: Lên, 3: Xuống
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-    # --- Vòng lặp chính của thuật toán ---
     while pq:
         if len(visited) > max_states:
             print(f"A*: Đã vượt quá {max_states} trạng thái. Dừng lại.")
@@ -125,7 +112,6 @@ def solve_with_a_star(level_data: List[List[str]], level_idx: int, max_states=50
             if new_state not in visited or new_g_cost < visited[new_state]:
                 visited[new_state] = new_g_cost
 
-                # Tính toán f(n) = g(n) + h(n)
                 h_cost = heuristic_manhattan_distance(new_boxes, goals)
                 f_cost = new_g_cost + h_cost
 

@@ -61,7 +61,7 @@ def _precompute_deadlocks(walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int
                         if (x_scan, r + dy) not in walls: is_stuck = False; break
                         if (x_scan, r) in goals: is_stuck = False; break
                     if not is_stuck: continue
-                    
+
                     is_stuck = True
                     for x_scan in range(c, width):
                         if (x_scan, r + dy) not in walls: is_stuck = False; break
@@ -83,16 +83,16 @@ def _precompute_deadlocks(walls: Set[Tuple[int, int]], goals: Set[Tuple[int, int
                         if (c, y_scan) in goals: is_stuck = False; break
                     if is_stuck:
                         deadlocks.add(pos)
-                        
+
     return deadlocks
 
 def energy_function(boxes: FrozenSet[Tuple[int, int]], goals: Set[Tuple[int, int]], deadlocks: Set[Tuple[int, int]]) -> int:
     if not goals:
         return 0
-    
+
     for b in boxes:
         if b not in goals and b in deadlocks:
-            return 100000 
+            return 100000
 
     total_manhattan_distance = 0
     goal_list = list(goals)
@@ -100,7 +100,7 @@ def energy_function(boxes: FrozenSet[Tuple[int, int]], goals: Set[Tuple[int, int
         if b in goals:
             continue
         total_manhattan_distance += min(abs(b[0] - g[0]) + abs(b[1] - g[1]) for g in goal_list)
-        
+
     return total_manhattan_distance
 
 
@@ -112,7 +112,7 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
                                    max_iterations: int = 50000,
                                    max_time: float = 10.0,
                                    restarts: int = 3) -> Optional[List[int]]:
-    
+
     walls = _get_walls(level_data)
     goals = _get_goals(level_data)
     deadlocks = _precompute_deadlocks(walls, goals, level_data)
@@ -159,7 +159,7 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
             dy = path_coords[i + 1][1] - path_coords[i][1]
             out.append(action_map[(dx, dy)])
         return out
-    
+
     calculate_energy = lambda boxes_pos: energy_function(boxes_pos, goals, deadlocks)
 
     if initial_temp is None:
@@ -168,7 +168,7 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
     best_state = start_state
     best_energy = calculate_energy(best_state[1])
     best_actions: List[int] = []
-    
+
     global_start = time.time()
 
     for attempt in range(max(1, restarts)):
@@ -200,22 +200,22 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
                     dest = (b[0] + dx, b[1] + dy)
                     if dest in walls or dest in boxes_pos:
                         continue
-                    
+
                     path_to_push = player_bfs(player_pos, push_from, boxes_pos)
                     if path_to_push is None:
                         continue
-                    
+
                     new_boxes = set(boxes_pos)
                     new_boxes.remove(b)
                     new_boxes.add(dest)
-                    
+
                     next_state = (b, frozenset(new_boxes))
                     actions_seq = coords_to_actions(path_to_push) + [action_map[(dx, dy)]]
                     ne = calculate_energy(next_state[1])
                     candidates.append((actions_seq, next_state, ne))
-            
+
             if not candidates:
-                break 
+                break
 
             candidates.sort(key=lambda t: t[2])
             topk = candidates[:min(10, len(candidates))]
@@ -226,14 +226,14 @@ def solve_with_simulated_annealing(level_data: List[List[str]], level_idx: int,
                 current_state = next_state
                 current_energy = next_energy
                 current_actions.extend(actions_seq)
-                
+
                 if current_energy < best_energy:
                     best_energy = current_energy
                     best_state = current_state
                     best_actions = current_actions.copy()
 
             temp *= cooling_rate
-        
+
     if best_energy == 0:
         elapsed = time.time() - global_start
         save_sa_solution(level_idx, best_actions, elapsed)
