@@ -18,7 +18,7 @@ Nhóm 5: Backtracking, Forward Checking, Arc consistency
 
 tải sokoban
 
-git clone https://github.com/hoangnghia24/DoAnAI/tree/master
+git clone https://github.com/hoangnghia24/DoAnAI.git
 
 Cách chơi:
 
